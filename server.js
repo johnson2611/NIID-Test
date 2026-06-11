@@ -9,13 +9,11 @@ const PORT = process.env.PORT || 3002;
 app.use(cors());
 app.use(express.json());
 
-// Connect to your NIID Neon database
 const pool = new Pool({
   connectionString: process.env.NIID_DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-// Test database connection
 pool.connect((err, client, release) => {
   if (err) {
     console.error("NIID Database connection error:", err.message);
@@ -44,7 +42,6 @@ app.post("/api/v2/vehicle/lookup", async (req, res) => {
 
   console.log(`NIID request received for: ${plateNumber}`);
 
-  // Validate API token
   if (!token) {
     console.log("Missing API token");
     return res.status(401).json({
@@ -64,7 +61,6 @@ app.post("/api/v2/vehicle/lookup", async (req, res) => {
   }
 
   try {
-    // Query Neon database
     const result = await pool.query(
       `SELECT registration_number, chassis_id, engine_id, manufacturer, 
               model, body_color, manufacture_year, status
@@ -113,7 +109,6 @@ app.post("/api/v2/vehicle/lookup", async (req, res) => {
   }
 });
 
-// Health check endpoint
 app.get("/health", (req, res) => {
   res.json({
     status: "NIID Service Running",
@@ -122,7 +117,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`NIID Mock Service Running`);
   console.log(`URL: http://localhost:${PORT}`);
